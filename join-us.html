@@ -24,7 +24,7 @@
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-      integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw=="
+      xintegrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
@@ -141,8 +141,9 @@
             </div>
 
             <div class="membership-form-container">
+              <!-- Added &hl=en to the src URL to force English language -->
               <iframe
-                src="https://docs.google.com/forms/d/e/1FAIpQLSehCdgzDqWTbRa8uYaCGNi-gdg418xiQ9_lnqleJl-L0Z3uSw/viewform?embedded=true"
+                src="https://docs.google.com/forms/d/e/1FAIpQLSehCdgzDqWTbRa8uYaCGNi-gdg418xiQ9_lnqleJl-L0Z3uSw/viewform?embedded=true&hl=en"
                 width="640"
                 height="640"
                 frameborder="0"
@@ -326,27 +327,5 @@
         }
       }
     </style>
-    <script>
-      document
-        .getElementById("join-form")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
-          const name = this.name.value;
-          const email = this.email.value;
-          const program = this.program.value;
-          const reason = this.reason.value;
-          const res = await fetch("http://localhost:5000/api/join", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, email, program, reason }),
-          });
-          if (res.ok) {
-            alert("Application sent! We will contact you soon.");
-            this.reset();
-          } else {
-            alert("Error sending application. Please try again.");
-          }
-        });
-    </script>
   </body>
 </html>

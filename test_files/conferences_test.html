@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Conferences - CMU Africa Research Club</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-red: #bb0000;
+            --dark-grey: #333;
+            --light-bg: #f4f4f9;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            margin: 0;
+            color: var(--dark-grey);
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        /* Header Section */
+        .section-header { text-align: center; margin-bottom: 40px; }
+        .section-title { color: var(--primary-red); font-size: 2.5rem; margin-bottom: 10px; }
+        .section-subtitle { max-width: 800px; margin: 0 auto; line-height: 1.6; color: #666; }
+
+        /* Filter Bar */
+        .filter-section {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box { flex: 2; position: relative; min-width: 250px; }
+        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; }
+        .search-box input {
+            width: 100%; padding: 12px 12px 12px 45px;
+            border: 1px solid #ddd; border-radius: 8px; font-size: 1rem;
+        }
+
+        .filter-dropdown { flex: 1; min-width: 200px; }
+        select {
+            width: 100%; padding: 12px; border: 1px solid #ddd;
+            border-radius: 8px; background: white; cursor: pointer;
+        }
+
+        /* Grid */
+        .conferences-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        /* Cards */
+        .conference-card {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .conference-card:hover { transform: translateY(-5px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); }
+
+        .conference-header {
+            padding: 20px;
+            background: #fafafa;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .conference-icon { font-size: 1.5rem; color: var(--primary-red); }
+        
+        .conference-meta { text-align: right; }
+        .conference-type { display: block; font-size: 0.75rem; font-weight: bold; color: #888; text-transform: uppercase; margin-bottom: 5px; }
+        
+        /* Urgency Tags */
+        .days-left { font-size: 0.75rem; font-weight: bold; padding: 4px 8px; border-radius: 4px; display: inline-block; }
+        .status-urgent { background: #ffe3e3; color: #e03131; border: 1px solid #ffc9c9; }
+        .status-warning { background: #fff4e6; color: #f76707; border: 1px solid #ffd8a8; }
+        .status-safe { background: #ebfbee; color: #2f9e44; border: 1px solid #b2f2bb; }
+        .status-passed { background: #f1f3f5; color: #868e96; }
+
+        .conference-content { padding: 20px; flex-grow: 1; }
+        .conference-title { margin: 0 0 5px 0; font-size: 1.25rem; }
+        .conference-theme { color: var(--primary-red); font-weight: 600; font-size: 0.9rem; margin-bottom: 15px; }
+        
+        .detail-item { font-size: 0.85rem; margin-bottom: 8px; color: #555; display: flex; align-items: center; gap: 10px; }
+        
+        .conference-link {
+            display: block; text-align: center; padding: 12px;
+            background: var(--dark-grey); color: white;
+            text-decoration: none; border-radius: 6px;
+            margin-top: 15px; transition: background 0.3s;
+        }
+        .conference-link:hover { background: var(--primary-red); }
+        
+        @media (max-width: 600px) { .filter-section { flex-direction: column; } }
+    </style>
+</head>
+<body>
+
+    <main class="container">
+        <header class="section-header">
+            <h1 class="section-title">Open Conferences</h1>
+            <p class="section-subtitle">The CMU-Africa Research Club curated list of upcoming submission opportunities. Filter by theme or search to find your target venue.</p>
+        </header>
+
+        <section class="filter-section">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search conference name, theme, or location...">
+            </div>
+            <div class="filter-dropdown">
+                <select id="themeSelect">
+                    <option value="all">All Themes</option>
+                    <option value="Computer Vision">Computer Vision</option>
+                    <option value="AI (General)">AI</option>
+                    <option value="Machine Learning">Machine Learning</option>
+                    <option value="Robotics">Robotics</option>
+                    <option value="NLP (Learning)">NLP</option>
+                    <option value="Data Mining">Data Mining</option>
+                    <option value="Neural Networks">Neural Networks</option>
+                </select>
+            </div>
+        </section>
+
+        <div id="conferencesGrid" class="conferences-grid">
+            </div>
+    </main>
+
+    <script>
+        const conferences = [
+            { title: "KSEM 2026", theme: "Knowledge Representation", type: "Full Paper", deadline: "2026-01-15", date: "July 17–19, 2026", location: "Beijing, China", link: "https://ksem2026.rosc.org.cn/", icon: "fa-network-wired" },
+            { title: "FG 2026", theme: "Computer Vision", type: "Abstract / Full Paper", deadline: "2026-01-15", date: "May 25–29, 2026", location: "Kyoto, Japan", link: "https://fg2026.ieee-biometrics.org/", icon: "fa-eye" },
+            { title: "ICWSM 2026", theme: "Social Media / IR", type: "Full Paper (Round 3)", deadline: "2026-01-16", date: "May 27–29, 2026", location: "Los Angeles, USA", link: "https://www.icwsm.org/2026/index.html", icon: "fa-hashtag" },
+            { title: "IJCAI 2026", theme: "AI (General)", type: "Abstract / Full Paper", deadline: "2026-01-20", date: "Aug 15–21, 2026", location: "Bremen, Germany", link: "https://2026.ijcai.org/", icon: "fa-robot" },
+            { title: "ICIP 2026", theme: "Computer Vision", type: "Full Paper", deadline: "2026-01-21", date: "Sep 13–17, 2026", location: "Tampere, Finland", link: "https://2026.ieeeicip.org/", icon: "fa-eye" },
+            { title: "SIGGRAPH 2026", theme: "Computer Graphics", type: "Abstract / Full Paper", deadline: "2026-01-22", date: "July 19–23, 2026", location: "Los Angeles, USA", link: "https://s2026.siggraph.org/", icon: "fa-paint-brush" },
+            { title: "SIGIR 2026", theme: "Info Retrieval", type: "Abstract / Full Paper", deadline: "2026-01-23", date: "July 20–24, 2026", location: "Melbourne, Australia", link: "https://sigir2026.org/en-AU", icon: "fa-search" },
+            { title: "GECCO 2026", theme: "Evolutionary Comp.", type: "Full Papers", deadline: "2026-01-27", date: "July 13–17, 2026", location: "San José, Costa Rica", link: "https://gecco-2026.sigevo.org/HomePage", icon: "fa-dna" },
+            { title: "ICML 2026", theme: "Machine Learning", type: "Abstract / Full Paper", deadline: "2026-01-29", date: "July 6–12, 2026", location: "Seoul, Korea", link: "https://icml.cc/Conferences/2026", icon: "fa-brain" },
+            { title: "RSS 2026", theme: "Robotics", type: "Abstract / Full Paper", deadline: "2026-01-31", date: "July 13–17, 2026", location: "Sydney, Australia", link: "https://roboticsconference.org", icon: "fa-robot" },
+            { title: "IJCNN 2026", theme: "Neural Networks", type: "Full Paper", deadline: "2026-02-01", date: "June 21–26, 2026", location: "Maastricht, Netherlands", link: "https://attend.ieee.org/wcci-2026/", icon: "fa-project-diagram" },
+            { title: "CogSci 2026", theme: "Cognitive Science", type: "Full Paper", deadline: "2026-02-03", date: "July 22–25, 2026", location: "Rio de Janeiro, Brazil", link: "https://cognitivesciencesociety.org/cogsci-2026/", icon: "fa-brain" },
+            { title: "ICMR 2026", theme: "Multimedia Retrieval", type: "Full Paper", deadline: "2026-02-07", date: "June 16–19, 2026", location: "Amsterdam, Netherlands", link: "https://seds.nu.edu.kz/icmr2026", icon: "fa-photo-video" },
+            { title: "SIGKDD 2026", theme: "Data Mining", type: "Abstract / Full Paper", deadline: "2026-02-09", date: "Aug 9–13, 2026", location: "Jeju, Korea", link: "https://kdd2026.kdd.org/", icon: "fa-database" },
+            { title: "KR 2026", theme: "Knowledge Rep.", type: "Abstract / Full Paper", deadline: "2026-02-14", date: "July 20–23, 2026", location: "Lisbon, Portugal", link: "https://kr.org/KR2026/", icon: "fa-network-wired" },
+            { title: "CoNLL 2026", theme: "NLP (Learning)", type: "Full Paper", deadline: "2026-02-20", date: "July 3–4, 2026", location: "San Diego, USA", link: "https://www.conll.org/", icon: "fa-language" },
+            { title: "Interspeech 2026", theme: "Speech Processing", type: "Full Paper", deadline: "2026-02-25", date: "Sep 27–Oct 1, 2026", location: "Sydney, Australia", link: "https://interspeech2026.org/", icon: "fa-microphone" },
+            { title: "MICCAI 2026", theme: "Medical Imaging", type: "Abstract / Full Paper", deadline: "2026-02-26", date: "Oct 4–8, 2026", location: "Abu Dhabi, UAE", link: "https://conferences.miccai.org/2026/en/default.asp", icon: "fa-x-ray" },
+            { title: "ICDAR 2026", theme: "Doc. Analysis", type: "Abstract / Full Paper", deadline: "2026-02-27", date: "Aug 30–Sep 4, 2026", location: "Vienna, Austria", link: "https://icdar2026.org/", icon: "fa-file-alt" },
+            { title: "ECCV 2026", theme: "Computer Vision", type: "Abstract / Full Paper", deadline: "2026-03-06", date: "Sep 8–13, 2026", location: "Malmö, Sweden", link: "https://eccv.ecva.net/", icon: "fa-eye" }
+        ];
+
+        function renderGrid(data) {
+            const grid = document.getElementById('conferencesGrid');
+            const now = new Date();
+            
+            grid.innerHTML = data.map(conf => {
+                const deadline = new Date(conf.deadline);
+                const diffDays = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
+                
+                let urgencyClass = 'status-safe';
+                let dayText = `${diffDays} days left`;
+                
+                if (diffDays < 0) {
+                    urgencyClass = 'status-passed';
+                    dayText = 'Deadline Passed';
+                } else if (diffDays <= 7) {
+                    urgencyClass = 'status-urgent';
+                } else if (diffDays <= 30) {
+                    urgencyClass = 'status-warning';
+                }
+
+                return `
+                    <div class="conference-card">
+                        <div class="conference-header">
+                            <div class="conference-icon"><i class="fas ${conf.icon}"></i></div>
+                            <div class="conference-meta">
+                                <span class="conference-type">${conf.type}</span>
+                                <span class="days-left ${urgencyClass}">${dayText}</span>
+                            </div>
+                        </div>
+                        <div class="conference-content">
+                            <h3 class="conference-title">${conf.title}</h3>
+                            <p class="conference-theme">${conf.theme}</p>
+                            <div class="conference-details">
+                                <div class="detail-item"><i class="fas fa-calendar-alt"></i><span>${conf.date}</span></div>
+                                <div class="detail-item"><i class="fas fa-map-marker-alt"></i><span>${conf.location}</span></div>
+                            </div>
+                            <a href="${conf.link}" target="_blank" class="conference-link">View Details</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Search and Filter Logic
+        function updateDisplay() {
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            const themeVal = document.getElementById('themeSelect').value;
+
+            const filtered = conferences.filter(c => {
+                const matchesSearch = c.title.toLowerCase().includes(searchVal) || 
+                                      c.theme.toLowerCase().includes(searchVal) ||
+                                      c.location.toLowerCase().includes(searchVal);
+                const matchesTheme = themeVal === 'all' || c.theme.includes(themeVal);
+                return matchesSearch && matchesTheme;
+            });
+            renderGrid(filtered);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', updateDisplay);
+        document.getElementById('themeSelect').addEventListener('change', updateDisplay);
+
+        // Run on load
+        renderGrid(conferences);
+    </script>
+</body>
+</html>
